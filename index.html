@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PixelCraft Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-blue: #0071e3;
+            --accent-blue-hover: #0077ed;
+            --success-green: #34c759;
+            --card-bg: #ffffff;
+            --border-radius: 18px;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .dark-mode {
+            --bg-primary: #000000;
+            --bg-secondary: #111113;
+            --text-primary: #f5f5f7;
+            --text-secondary: #a1a1aa;
+            --card-bg: #1c1c1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: 0;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .hidden { display: none !important; }
+
+        /* === TOP NAVBAR === */
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1.25rem 1.5rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            width: 220px;
+            overflow: hidden;
+            z-index: 101;
+        }
+
+        .dropdown-item {
+            padding: 0.875rem 1.25rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* === LOGIN STYLES === */
+        .login-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            margin: 10vh auto;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--bg-primary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .login-btn.google { background: #f8f9fa; color: var(--text-primary); }
+        .login-btn.github { background: #f8f9fa; color: var(--text-primary); }
+        .login-btn.phone { background: var(--bg-primary); color: var(--text-primary); border-color: var(--accent-blue); }
+
+        .login-btn i { margin-right: 0.75rem; font-size: 1.1em; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent-blue);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+        }
+
+        .back-btn i { margin-right: 0.5rem; }
+        .back-btn:hover { text-decoration: underline; }
+
+        /* === PORTFOLIO STYLES === */
+        .hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary), #8a8a8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subheading {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .skill-badge {
+            background: var(--bg-primary);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.625rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .heading {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .subheading {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .card-title {
+            font-size: 1.375rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .card-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-tag {
+            background: var(--bg-secondary);
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--accent-blue);
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-blue-hover);
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .contact-link:hover {
+            background: var(--bg-secondary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+        }
+
+        .github-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .github-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .heading { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGES -->
+    <div id="loginPage" class="login-container">
+        <div class="login-header">
+            <h1 class="login-title">Welcome to PixelCraft</h1>
+            <p class="login-subtitle">Choose your login method</p>
+        </div>
+        <div class="login-options">
+            <button class="login-btn google" id="googleBtn">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+            <button class="login-btn github" onclick="loginWithGithub()">
+                <i class="fab fa-github"></i> Continue with GitHub
+            </button>
+            <button class="login-btn phone" onclick="showPhoneForm()">
+                <i class="fas fa-phone"></i> Continue with WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div id="phoneFormPage" class="login-container hidden">
+        <div class="back-btn" onclick="showLoginPage()">
+            <i class="fas fa-arrow-left"></i> Back
+        </div>
+        <div class="login-header">
+            <h1 class="login-title">Login via WhatsApp</h1>
+            <p class="login-subtitle">Enter your details below</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" id="username" class="form-input" placeholder="e.g. johndoe" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" id="firstName" class="form-input" placeholder="John" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" id="lastName" class="form-input" placeholder="Doe" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Phone Number (WhatsApp)</label>
+            <input type="tel" id="phoneNumber" class="form-input" placeholder="081234567890" />
+        </div>
+        <button class="login-btn phone" style="width:100%" onclick="sendVerificationCode()" id="sendOtpBtn">
+            Send Verification Code
+        </button>
+    </div>
+
+    <div id="otpPage" class="login-container hidden">
+        <div class="back-btn" onclick="showPhoneForm()">
+            <i class="fas fa-arrow-left"></i> Back
+        </div>
+        <div class="login-header">
+            <h1 class="login-title">Enter OTP</h1>
+            <p class="login-subtitle">We sent a 6-digit code to your WhatsApp</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Verification Code</label>
+            <input type="text" id="otpCode" class="form-input" placeholder="123456" maxlength="6" />
+            <p id="otpError" style="color: #ff3b30; margin-top: 0.5rem; font-size: 0.9rem; height: 1.2rem;"></p>
+        </div>
+        <button class="login-btn phone" style="width:100%" onclick="verifyCode()" id="verifyOtpBtn">
+            Verify Code
+        </button>
+        <p style="text-align:center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+            Code expires in <span id="countdown">10:00</span>
+        </p>
+    </div>
+
+    <!-- PORTFOLIO PAGE -->
+    <div id="portfolioPage" class="hidden">
+        <div class="navbar">
+            <button class="menu-btn" onclick="toggleDropdown()">☰</button>
+            <div id="userDropdown" class="dropdown hidden"></div>
+        </div>
+
+        <div class="hero">
+            <div class="container">
+                <h1 class="hero-title" id="hero-title">PixelCraft Studio</h1>
+                <p class="hero-subheading" id="hero-subheading">Membantu UMKM dan teman-teman sekolah dengan solusi desain grafis, pengembangan web, editing video, dan bot WhatsApp yang efektif.</p>
+                <div class="skills-container" id="skills-container"></div>
+            </div>
+        </div>
+
+        <section id="about">
+            <div class="container">
+                <h2 class="heading">Tentang Saya</h2>
+                <p class="subheading">Saya seorang pelajar yang aktif membantu teman-teman sekolah dan pelaku UMKM lokal dengan jasa visual dan pengembangan teknologi. Dengan pendekatan yang ramah dan solusi yang terjangkau, saya berkomitmen memberikan hasil terbaik sesuai kebutuhan klien.</p>
+                
+                <div class="contact-links">
+                    <a href="https://wa.me/6287748800409" class="contact-link" target="_blank">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="https://instagram.com/yourusername" class="contact-link" target="_blank">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://facebook.com/yourusername" class="contact-link" target="_blank">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </a>
+                    <a href="https://t.me/yourusername" class="contact-link" target="_blank">
+                        <i class="fab fa-telegram"></i> Telegram
+                    </a>
+                    <a href="mailto:youremail@example.com" class="contact-link">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <div class="container">
+                <h2 class="heading">Portfolio</h2>
+                <p class="subheading">Beberapa proyek terbaik yang telah saya kerjakan</p>
+                <div class="grid-cards" id="portfolio-container"></div>
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="container">
+                <h2 class="heading">Layanan</h2>
+                <p class="subheading">Berikut layanan yang saya tawarkan dengan harga terjangkau</p>
+                <div class="grid-cards" id="services-container"></div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <p id="copyright">© 2025 PixelCraft Studio. All rights reserved.</p>
+                <p>Source code tersedia di <a href="https://github.com/username/portfolio" class="github-link" id="github-link">GitHub</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODALS -->
+    <div id="profileModal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="modal-content" style="background: var(--card-bg); border-radius: 18px; padding: 2.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow-md);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Profil Saya</h3>
+                <button class="close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <img id="profilePic" class="profile-pic" src="https://placehold.co/120x120/1c1c1e/ffffff?text=👤" alt="Profile" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: var(--bg-secondary); display: block; margin: 0 auto 1.5rem;">
+            <input type="file" id="profilePicInput" class="file-input" accept="image/*" onchange="previewProfilePic(this)" style="display: block; margin: 0.5rem auto;">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="profileUsername" class="form-input" readonly>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="profilePassword" class="form-input" value="********" readonly>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="modal-content" style="background: var(--card-bg); border-radius: 18px; padding: 2.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow-md);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Settings</h3>
+                <button class="close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Mode</label>
+                <select id="modeSelect" class="form-input" onchange="changeMode(this.value)" style="width: 100%; padding: 0.875rem; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; font-family: var(--font-sans); font-size: 1rem; background: var(--bg-secondary); color: var(--text-primary);">
+                    <option value="system">System</option>
+                    <option value="light">Terang</option>
+                    <option value="dark">Gelap</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Bahasa</label>
+                <select id="langSelect" class="form-input" onchange="changeLanguage(this.value)" style="width: 100%; padding: 0.875rem; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; font-family: var(--font-sans); font-size: 1rem; background: var(--bg-secondary); color: var(--text-primary);">
+                    <option value="id">Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Ubah Password</label>
+                <button class="btn" style="width:100%" onclick="showPasswordChange()">Ubah Password</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="modal-content" style="background: var(--card-bg); border-radius: 18px; padding: 2.5rem; width: 90%; max-width: 500px; box-shadow: var(--shadow-md);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Ubah Password</h3>
+                <button class="close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);" onclick="closeModal('passwordModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Password Lama</label>
+                <input type="password" id="oldPassword" class="form-input" placeholder="Masukkan password lama">
+            </div>
+            <div class="form-group">
+                <label>Password Baru</label>
+                <input type="password" id="newPassword" class="form-input" placeholder="Masukkan password baru">
+            </div>
+            <button class="btn" style="width:100%" onclick="changePassword()">Simpan</button>
+        </div>
+    </div>
+
+    <script>
+        let phoneData = null;
+        let otpExpiry = null;
+        let currentUser = null;
+        let generatedOtp = null;
+
+        const loginPage = document.getElementById('loginPage');
+        const phoneFormPage = document.getElementById('phoneFormPage');
+        const otpPage = document.getElementById('otpPage');
+        const portfolioPage = document.getElementById('portfolioPage');
+        const dropdown = document.getElementById('userDropdown');
+
+        // Auto-login if saved
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('pixelcraft_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                applyMode();
+                showPortfolio();
+            } else {
+                showLoginPage();
+            }
+        });
+
+        function showLoginPage() {
+            loginPage.classList.remove('hidden');
+            phoneFormPage.classList.add('hidden');
+            otpPage.classList.add('hidden');
+            portfolioPage.classList.add('hidden');
+            dropdown.classList.add('hidden');
+        }
+
+        function showPhoneForm() {
+            loginPage.classList.add('hidden');
+            phoneFormPage.classList.remove('hidden');
+            otpPage.classList.add('hidden');
+        }
+
+        function showOtpPage() {
+            phoneFormPage.classList.add('hidden');
+            otpPage.classList.remove('hidden');
+            startCountdown();
+        }
+
+        function showPortfolio() {
+            loginPage.classList.add('hidden');
+            phoneFormPage.classList.add('hidden');
+            otpPage.classList.add('hidden');
+            portfolioPage.classList.remove('hidden');
+            renderPortfolio();
+        }
+
+        // Google Login
+        function initGoogleClient() {
+            if (window.google) return;
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+
+        document.getElementById('googleBtn').onclick = function() {
+            initGoogleClient();
+            setTimeout(() => {
+                if (!window.google) return alert('Gagal memuat Google login.');
+                const client = window.google.accounts.oauth2.initTokenClient({
+                    client_id: window.PORTFOLIO_CONFIG.AUTH.GOOGLE_CLIENT_ID,
+                    scope: 'openid email profile',
+                    callback: (resp) => {
+                        if (resp.access_token) {
+                            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                                headers: { Authorization: `Bearer ${resp.access_token}` }
+                            }).then(res => res.json()).then(user => {
+                                currentUser = {
+                                    id: user.sub,
+                                    username: user.email.split('@')[0],
+                                    name: user.name,
+                                    email: user.email,
+                                    password: 'oauth_google',
+                                    method: 'google',
+                                    avatar: user.picture || null
+                                };
+                                saveUser();
+                                showPortfolio();
+                            });
+                        }
+                    }
+                });
+                client.requestAccessToken();
+            }, 300);
+        };
+
+        // GitHub Login
+        function loginWithGithub() {
+            const username = prompt("Masukkan username GitHub Anda:");
+            if (username) {
+                currentUser = {
+                    id: Date.now(),
+                    username: username,
+                    name: username,
+                    email: `${username}@github.com`,
+                    password: 'oauth_github',
+                    method: 'github'
+                };
+                saveUser();
+                showPortfolio();
+            }
+        }
+
+        // Phone Validation
+        function validatePhone(phone) {
+            const clean = phone.replace(/\D/g, '');
+            if (clean.startsWith('0')) return '62' + clean.slice(1);
+            if (clean.startsWith('62')) return clean;
+            return null;
+        }
+
+        // REAL OTP via Fonnte.com
+        async function sendVerificationCode() {
+            const username = document.getElementById('username').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const phoneInput = document.getElementById('phoneNumber').value.trim();
+            const phone = validatePhone(phoneInput);
+
+            if (!username || !firstName || !lastName || !phone) {
+                alert('Harap isi semua kolom dengan nomor WhatsApp yang valid (contoh: 081234567890).');
+                return;
+            }
+
+            const sendBtn = document.getElementById('sendOtpBtn');
+            sendBtn.classList.add('btn-loading');
+            sendBtn.disabled = true;
+
+            try {
+                // Generate OTP
+                generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                otpExpiry = Date.now() + 10 * 60 * 1000; // 10 menit
+
+                // Kirim via Fonnte API
+                const response = await fetch(window.PORTFOLIO_CONFIG.AUTH.FONNTE_API_URL.trim(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': window.PORTFOLIO_CONFIG.AUTH.FONNTE_API_TOKEN.trim()
+                    },
+                    body: JSON.stringify({
+                        target: phone,
+                        message: `Kode verifikasi PixelCraft Anda: ${generatedOtp}\nBerlaku 10 menit.`,
+                        countrycode: '62'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status) {
+                    phoneData = { username, firstName, lastName, phone, password: "default123" };
+                    showOtpPage();
+                } else {
+                    throw new Error(result.message || 'Gagal mengirim OTP');
+                }
+            } catch (error) {
+                console.error('Fonnte error:', error);
+                alert('Gagal mengirim kode verifikasi. Pastikan nomor WhatsApp valid.');
+            } finally {
+                sendBtn.classList.remove('btn-loading');
+                sendBtn.disabled = false;
+            }
+        }
+
+        function startCountdown() {
+            const countdownEl = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                const diff = otpExpiry - Date.now();
+                if (diff <= 0) {
+                    clearInterval(interval);
+                    countdownEl.textContent = "00:00";
+                    alert("Kode verifikasi kedaluwarsa. Silakan minta kode baru.");
+                    showPhoneForm();
+                    return;
+                }
+                const mins = Math.floor(diff / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                countdownEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function verifyCode() {
+            const input = document.getElementById('otpCode').value.trim();
+            const errorEl = document.getElementById('otpError');
+
+            if (Date.now() > otpExpiry) {
+                errorEl.textContent = "Kode kedaluwarsa.";
+                return;
+            }
+
+            if (input === generatedOtp) {
+                currentUser = {
+                    id: Date.now(),
+                    username: phoneData.username,
+                    name: `${phoneData.firstName} ${phoneData.lastName}`,
+                    phone: phoneData.phone,
+                    password: phoneData.password,
+                    method: 'phone'
+                };
+                saveUser();
+                showPortfolio();
+            } else {
+                errorEl.textContent = "Kode salah. Coba lagi.";
+            }
+        }
+
+        function saveUser() {
+            localStorage.setItem('pixelcraft_user', JSON.stringify(currentUser));
+        }
+
+        // Portfolio Rendering
+        function renderPortfolio() {
+            document.getElementById('hero-title').textContent = window.PORTFOLIO_CONFIG.NAME_HERO;
+            document.getElementById('hero-subheading').textContent = window.PORTFOLIO_CONFIG.SUB_HEADLINE;
+            document.getElementById('copyright').innerHTML = `© ${new Date().getFullYear()} ${window.PORTFOLIO_CONFIG.NAME_HERO}. All rights reserved.`;
+            document.getElementById('github-link').href = window.PORTFOLIO_CONFIG.GITHUB_LINK.trim();
+
+            const skills = document.getElementById('skills-container');
+            skills.innerHTML = '';
+            (window.PORTFOLIO_CONFIG.SKILLS_BADGES || []).forEach(skill => {
+                const el = document.createElement('span');
+                el.className = 'skill-badge';
+                el.textContent = skill;
+                skills.appendChild(el);
+            });
+
+            const portfolio = document.getElementById('portfolio-container');
+            portfolio.innerHTML = '';
+            (window.PORTFOLIO_CONFIG.PORTFOLIO_CARDS || []).forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.innerHTML = `
+                    <h3 class="card-title">${card.title}</h3>
+                    <p class="card-desc">${card.description}</p>
+                    <div class="card-tools">
+                        ${(card.tools || []).map(t => `<span class="tool-tag">${t}</span>`).join('')}
+                    </div>
+                    <a href="${card.demoLink || '#'}" target="_blank" class="btn">Lihat Demo</a>
+                `;
+                portfolio.appendChild(el);
+            });
+
+            const services = document.getElementById('services-container');
+            services.innerHTML = '';
+            (window.PORTFOLIO_CONFIG.SERVICES_LIST || []).forEach(svc => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.innerHTML = `
+                    <h3 class="card-title">${svc.name}</h3>
+                    <p class="card-desc">${svc.price}</p>
+                `;
+                services.appendChild(el);
+            });
+        }
+
+        // Dropdown
+        function toggleDropdown() {
+            dropdown.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-btn') && !e.target.closest('.dropdown')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        dropdown.innerHTML = `
+            <div class="dropdown-item" onclick="showProfile()">Profil Saya</div>
+            <div class="dropdown-item" onclick="showSettings()">Settings</div>
+            <div class="dropdown-item" onclick="showDeveloper()">Developer</div>
+            <div class="dropdown-item" style="color:#ff3b30;" onclick="confirmLogout()">Logout</div>
+        `;
+
+        // Modals
+        function showProfile() {
+            document.getElementById('profileUsername').value = currentUser.username;
+            document.getElementById('profilePassword').value = "********";
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function previewProfilePic(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('profilePic').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showSettings() {
+            const mode = localStorage.getItem('pixelcraft_mode') || 'system';
+            const lang = localStorage.getItem('pixelcraft_lang') || 'id';
+            document.getElementById('modeSelect').value = mode;
+            document.getElementById('langSelect').value = lang;
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function changeMode(mode) {
+            localStorage.setItem('pixelcraft_mode', mode);
+            applyMode();
+        }
+
+        function applyMode() {
+            const mode = localStorage.getItem('pixelcraft_mode') || 'system';
+            document.body.classList.remove('dark-mode');
+            if (mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('pixelcraft_lang', lang);
+            alert(`Bahasa diubah ke: ${lang === 'en' ? 'English' : 'Indonesia'}`);
+        }
+
+        function showPasswordChange() {
+            closeModal('settingsModal');
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        function changePassword() {
+            const oldPass = document.getElementById('oldPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            
+            if (oldPass === currentUser.password) {
+                currentUser.password = newPass;
+                saveUser();
+                alert('Password berhasil diubah!');
+                closeModal('passwordModal');
+            } else {
+                alert('Password lama salah!');
+            }
+        }
+
+        function showDeveloper() {
+            alert('Dikembangkan oleh PixelCraft Studio\n© 2025');
+        }
+
+        function confirmLogout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('pixelcraft_user');
+                currentUser = null;
+                showLoginPage();
+            }
+        }
+    </script>
+</body>
+</html>
